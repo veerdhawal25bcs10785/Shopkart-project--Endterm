@@ -1,0 +1,183 @@
+{
+  "info": {
+    "_postman_id": "8f3b610c-96b4-4b53-912b-3e5e6e30029b",
+    "name": "ShopKart - Customer Authentication Service",
+    "description": "Postman collection for testing ShopKart Authentication APIs (Lab 01).\nBase URL is set to `http://localhost:5000` via collection variable `baseUrl`.\nCookies are automatically managed by Postman.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Register Customer",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"John Doe\",\n  \"email\": \"john@gmail.com\",\n  \"password\": \"john123\",\n  \"phone\": \"9876543210\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/customers/register",
+          "host": ["{{baseUrl}}"],
+          "path": ["customers", "register"]
+        },
+        "description": "Registers a new customer. Verifies all fields, rejects duplicate emails, ensures password >= 6 chars, and stores password as bcrypt hash."
+      },
+      "response": []
+    },
+    {
+      "name": "2. Register - Duplicate Email (Failure 409)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"John Doe Clone\",\n  \"email\": \"john@gmail.com\",\n  \"password\": \"john123\",\n  \"phone\": \"9876543210\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/customers/register",
+          "host": ["{{baseUrl}}"],
+          "path": ["customers", "register"]
+        },
+        "description": "Attempting to register with an already existing email returns 409 Conflict."
+      },
+      "response": []
+    },
+    {
+      "name": "3. Register - Validation Errors (Failure 400)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Short Pass\",\n  \"email\": \"short@gmail.com\",\n  \"password\": \"123\",\n  \"phone\": \"9876543210\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/customers/register",
+          "host": ["{{baseUrl}}"],
+          "path": ["customers", "register"]
+        },
+        "description": "Attempting to register with password < 6 characters returns 400 Bad Request."
+      },
+      "response": []
+    },
+    {
+      "name": "4. Login Customer",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"john@gmail.com\",\n  \"password\": \"john123\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/customers/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["customers", "login"]
+        },
+        "description": "Authenticates customer, issues JWT inside HttpOnly cookie `token`."
+      },
+      "response": []
+    },
+    {
+      "name": "5. Login - Invalid Credentials (Failure 401)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"john@gmail.com\",\n  \"password\": \"wrongpass\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/customers/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["customers", "login"]
+        },
+        "description": "Returns 401 with generic message without revealing if email or password was wrong."
+      },
+      "response": []
+    },
+    {
+      "name": "6. My Profile (Protected)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/customers/me",
+          "host": ["{{baseUrl}}"],
+          "path": ["customers", "me"]
+        },
+        "description": "Returns customer profile. Requires valid JWT in `token` cookie. Password is never returned."
+      },
+      "response": []
+    },
+    {
+      "name": "7. Change Password (Bonus +10)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"oldPassword\": \"john123\",\n  \"newPassword\": \"johnNewPass456\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/customers/change-password",
+          "host": ["{{baseUrl}}"],
+          "path": ["customers", "change-password"]
+        },
+        "description": "Bonus challenge: Authenticated customer updates their password after verifying old password."
+      },
+      "response": []
+    },
+    {
+      "name": "8. Logout Customer (Protected)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/customers/logout",
+          "host": ["{{baseUrl}}"],
+          "path": ["customers", "logout"]
+        },
+        "description": "Clears HttpOnly cookie `token` and logs out customer."
+      },
+      "response": []
+    }
+  ]
+}

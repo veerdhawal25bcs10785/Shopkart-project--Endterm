@@ -1,0 +1,189 @@
+{
+  "info": {
+    "_postman_id": "8f4a1c3e-5678-4293-8765-f1deb1c97b22",
+    "name": "ShopKart - Checkout & Orders (Lab 06)",
+    "description": "Postman collection for testing ShopKart Checkout, Razorpay Payment Order, Signature Verification, and Orders History APIs (Engineering Lab 06).\nBase URL defaults to `http://localhost:5000` via collection variable `baseUrl`.\nCookies/JWT are automatically handled across requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "orderId",
+      "value": "67cb1a48c123456789012345",
+      "type": "string"
+    },
+    {
+      "key": "razorpayOrderId",
+      "value": "order_mock123",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Login Customer (Pre-requisite)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"john@gmail.com\",\n  \"password\": \"john123\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/customers/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["customers", "login"]
+        },
+        "description": "Logs in the customer and stores the JWT cookie."
+      },
+      "response": []
+    },
+    {
+      "name": "2. Inspect Cart before Checkout",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/cart",
+          "host": ["{{baseUrl}}"],
+          "path": ["cart"]
+        },
+        "description": "Ensures user has products in their cart before initiating checkout."
+      },
+      "response": []
+    },
+    {
+      "name": "3. Create Payment Order (Checkout)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"shippingAddress\": {\n    \"fullName\": \"John Doe\",\n    \"addressLine\": \"Flat 402, Lotus Enclave\",\n    \"city\": \"Bengaluru\",\n    \"state\": \"Karnataka\",\n    \"postalCode\": \"560001\",\n    \"phone\": \"9876543210\"\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/orders/create-payment-order",
+          "host": ["{{baseUrl}}"],
+          "path": ["orders", "create-payment-order"]
+        },
+        "description": "Validates cart & stock, calculates server total, creates pending order & Razorpay order."
+      },
+      "response": []
+    },
+    {
+      "name": "4. Verify Cart Remains Intact (Before Payment)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/cart",
+          "host": ["{{baseUrl}}"],
+          "path": ["cart"]
+        },
+        "description": "Cart must NOT be cleared when merely creating a payment order."
+      },
+      "response": []
+    },
+    {
+      "name": "5. Verify Payment (HMAC SHA-256)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"orderId\": \"{{orderId}}\",\n  \"razorpay_order_id\": \"{{razorpayOrderId}}\",\n  \"razorpay_payment_id\": \"pay_mock_12345\",\n  \"razorpay_signature\": \"mock_sandbox_signature\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/orders/verify-payment",
+          "host": ["{{baseUrl}}"],
+          "path": ["orders", "verify-payment"]
+        },
+        "description": "Verifies signature, marks order PAID, deducts product stock, and clears user cart."
+      },
+      "response": []
+    },
+    {
+      "name": "6. Confirm Cart Cleared (After Payment)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/cart",
+          "host": ["{{baseUrl}}"],
+          "path": ["cart"]
+        },
+        "description": "Cart must be empty after verified payment."
+      },
+      "response": []
+    },
+    {
+      "name": "7. Get All My Orders",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/orders",
+          "host": ["{{baseUrl}}"],
+          "path": ["orders"]
+        },
+        "description": "Returns all historical orders for authenticated customer sorted newest first."
+      },
+      "response": []
+    },
+    {
+      "name": "8. Get Single Order Details",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/orders/{{orderId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["orders", "{{orderId}}"]
+        },
+        "description": "Returns full order details with ownership verification."
+      },
+      "response": []
+    },
+    {
+      "name": "9. Bonus: Update Order Status",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"orderStatus\": \"SHIPPED\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/orders/{{orderId}}/status",
+          "host": ["{{baseUrl}}"],
+          "path": ["orders", "{{orderId}}", "status"]
+        },
+        "description": "Updates order status progression (PLACED -> CONFIRMED -> SHIPPED -> DELIVERED)."
+      },
+      "response": []
+    }
+  ]
+}

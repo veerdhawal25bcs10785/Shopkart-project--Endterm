@@ -1,0 +1,182 @@
+{
+  "info": {
+    "_postman_id": "9b1c7a82-1234-4567-89ab-cdef01234567",
+    "name": "ShopKart - Shopping Cart API (Lab 05)",
+    "description": "Postman collection for testing ShopKart Shopping Cart APIs (Engineering Lab 05).\nBase URL defaults to `http://localhost:5000` via collection variable `baseUrl`.\nAuthentication cookies/JWT are automatically handled across requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "productId",
+      "value": "67cb1a48c123456789012345",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Login Customer (Pre-requisite)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"john@gmail.com\",\n  \"password\": \"john123\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/customers/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["customers", "login"]
+        },
+        "description": "Logs in the customer and sets the authentication token in cookies."
+      },
+      "response": []
+    },
+    {
+      "name": "2. Get Products (To inspect product IDs and stock)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/products",
+          "host": ["{{baseUrl}}"],
+          "path": ["products"]
+        },
+        "description": "Fetches product catalog to obtain a valid product ID for cart operations."
+      },
+      "response": []
+    },
+    {
+      "name": "3. Add Product to Cart (POST /cart/:productId - Quantity = 1)",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{baseUrl}}/cart/{{productId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["cart", "{{productId}}"]
+        },
+        "description": "Adds a product to the authenticated user's cart. If absent, sets quantity to 1."
+      },
+      "response": []
+    },
+    {
+      "name": "4. Add Same Product Again (POST /cart/:productId - Quantity = 2)",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{baseUrl}}/cart/{{productId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["cart", "{{productId}}"]
+        },
+        "description": "Adding the same product again increments existing quantity to 2 without creating duplicate rows."
+      },
+      "response": []
+    },
+    {
+      "name": "5. Get Current User Cart (GET /cart)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/cart",
+          "host": ["{{baseUrl}}"],
+          "path": ["cart"]
+        },
+        "description": "Returns the authenticated user's cart with populated product data (name, price, stock, image)."
+      },
+      "response": []
+    },
+    {
+      "name": "6. Update Quantity (PATCH /cart/:productId)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"quantity\": 3\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/cart/{{productId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["cart", "{{productId}}"]
+        },
+        "description": "Updates the quantity of an existing cart item. Rejects if quantity exceeds product stock."
+      },
+      "response": []
+    },
+    {
+      "name": "7. Exceed Stock Limit (PATCH /cart/:productId - Expect 400)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"quantity\": 9999\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/cart/{{productId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["cart", "{{productId}}"]
+        },
+        "description": "Requesting quantity exceeding product stock returns 400 Bad Request."
+      },
+      "response": []
+    },
+    {
+      "name": "8. Remove Product from Cart (DELETE /cart/:productId)",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{baseUrl}}/cart/{{productId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["cart", "{{productId}}"]
+        },
+        "description": "Removes the product from the user's cart and returns updated cart."
+      },
+      "response": []
+    },
+    {
+      "name": "9. Clear Entire Cart (DELETE /cart)",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{baseUrl}}/cart",
+          "host": ["{{baseUrl}}"],
+          "path": ["cart"]
+        },
+        "description": "Empties the authenticated user's cart."
+      },
+      "response": []
+    },
+    {
+      "name": "10. Unauthenticated Cart Request (Expect 401)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/cart",
+          "host": ["{{baseUrl}}"],
+          "path": ["cart"]
+        },
+        "description": "Accessing cart without authentication token returns 401 Unauthorized."
+      },
+      "response": []
+    }
+  ]
+}

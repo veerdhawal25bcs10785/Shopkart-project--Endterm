@@ -1,0 +1,149 @@
+{
+  "info": {
+    "_postman_id": "7a3e9c2b-4567-4182-9654-e0cfa0b86a11",
+    "name": "ShopKart - Wishlist API (Lab 04)",
+    "description": "Postman collection for testing ShopKart Wishlist APIs (Engineering Lab 04).\nBase URL defaults to `http://localhost:5000` via collection variable `baseUrl`.\nCookies/JWT are automatically handled across requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "productId",
+      "value": "67cb1a48c123456789012345",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Login Customer (Pre-requisite)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"john@gmail.com\",\n  \"password\": \"john123\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/customers/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["customers", "login"]
+        },
+        "description": "Logs in the customer and sets the authentication token in cookies."
+      },
+      "response": []
+    },
+    {
+      "name": "2. Get Products (To grab a valid productId)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/products",
+          "host": ["{{baseUrl}}"],
+          "path": ["products"]
+        },
+        "description": "Fetches product catalog to obtain a valid product ID for wishlist operations."
+      },
+      "response": []
+    },
+    {
+      "name": "3. Add Product to Wishlist (POST /wishlist/:productId)",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{baseUrl}}/wishlist/{{productId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["wishlist", "{{productId}}"]
+        },
+        "description": "Adds a product reference (ObjectId) to the authenticated customer's wishlist. Returns 200/201."
+      },
+      "response": []
+    },
+    {
+      "name": "4. Duplicate Add to Wishlist (Expect 409 Conflict)",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{baseUrl}}/wishlist/{{productId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["wishlist", "{{productId}}"]
+        },
+        "description": "Attempting to add the same product again returns 409 Conflict with duplicate prevention."
+      },
+      "response": []
+    },
+    {
+      "name": "5. Get Current User Wishlist (GET /wishlist)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/wishlist",
+          "host": ["{{baseUrl}}"],
+          "path": ["wishlist"]
+        },
+        "description": "Returns the authenticated user's wishlist with populated product details (name, price, category, image, stock)."
+      },
+      "response": []
+    },
+    {
+      "name": "6. Bonus: Get Wishlist Count (GET /wishlist/count)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/wishlist",
+          "host": ["{{baseUrl}}"],
+          "path": ["wishlist", "count"]
+        },
+        "description": "Returns the count of saved wishlist items for navbar integration."
+      },
+      "response": []
+    },
+    {
+      "name": "7. Bonus: Toggle Product Wishlist (PATCH /wishlist/:productId/toggle)",
+      "request": {
+        "method": "PATCH",
+        "url": {
+          "raw": "{{baseUrl}}/wishlist/{{productId}}/toggle",
+          "host": ["{{baseUrl}}"],
+          "path": ["wishlist", "{{productId}}", "toggle"]
+        },
+        "description": "Toggles saved state: removes if present, adds if absent."
+      },
+      "response": []
+    },
+    {
+      "name": "8. Remove Product from Wishlist (DELETE /wishlist/:productId)",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{baseUrl}}/wishlist/{{productId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["wishlist", "{{productId}}"]
+        },
+        "description": "Removes the product reference from the user's wishlist."
+      },
+      "response": []
+    },
+    {
+      "name": "9. Remove Absent Product (Expect 404 Not Found)",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{baseUrl}}/wishlist/{{productId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["wishlist", "{{productId}}"]
+        },
+        "description": "Removing a product not present in wishlist returns 404 Not Found."
+      },
+      "response": []
+    }
+  ]
+}

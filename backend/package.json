@@ -1,0 +1,39 @@
+{
+  "name": "shopkart-backend",
+  "version": "1.0.0",
+  "description": "ShopKart Customer Authentication Service - Engineering Lab 01",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "node test/customer.test.js",
+    "test:products": "node test/product.test.js",
+    "test:wishlist": "node test/wishlist.test.js",
+    "test:cart": "node test/cart.test.js",
+    "test:orders": "node test/order.test.js",
+    "test:all": "node test/customer.test.js && node test/product.test.js && node test/wishlist.test.js && node test/cart.test.js && node test/order.test.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.5",
+    "razorpay": "^2.9.8"
+  },
+  "devDependencies": {
+    "mongodb-memory-server": "^10.4.3",
+    "supertest": "^7.0.0"
+  },
+  "keywords": [
+    "shopkart",
+    "authentication",
+    "jwt",
+    "express",
+    "mongoose"
+  ],
+  "author": "ShopKart Backend Team",
+  "license": "ISC"
+}
